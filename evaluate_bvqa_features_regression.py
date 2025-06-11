@@ -13,7 +13,10 @@ python evaluate_bvqa_features_regression.py \
 
 '''
 
-import pandas
+try:
+  import pandas
+except ImportError:  # Allow importing without pandas for testing
+  pandas = None
 import scipy.io
 import numpy as np
 import argparse
@@ -312,7 +315,7 @@ def main(args):
   dir_path = os.path.dirname(args.best_parameter)
   if not os.path.exists(dir_path):
     os.makedirs(dir_path)
-  scipy.io.savemat(args.best_parameter+'_'+args.num_iterations+'iter.mat', 
+  scipy.io.savemat(args.best_parameter+'_'+str(args.num_iterations)+'iter.mat',
       mdict={'best_parameters': np.asarray(best_parameters,dtype=object)})
 
 if __name__ == '__main__':
