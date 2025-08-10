@@ -63,7 +63,8 @@ def arg_parser():
   parser.add_argument('--dataset_name', type=str, default='LIVE-Meta-Gaming',
                       help='Trained dataset.') 
   parser.add_argument('--feature_file', type=str,
-                      default='feat_files/LIVE-Meta-Mobile-Cloud-Gaming_GAMIVAL_bicubic_feats.mat',
+                      # default='feat_files/LIVE-Meta-Mobile-Cloud-Gaming_GAMIVAL_bicubic_feats.mat',
+                      default='feat_files/LIVE-Meta-Mobile-Cloud-Gaming_CNN_bicubic_feats.mat',
                       help='Pre-computed feature matrix.')
   parser.add_argument('--best_parameter', type=str,
                       default='best_pamtr/LIVE-Meta-Mobile-Cloud-Gaming_GAMIVAL_pamtr',
@@ -149,16 +150,16 @@ def main(args):
   df = pandas.read_csv(csv_file)
   y = df['MOS'].to_numpy()
 
-  y = np.array(list(y), dtype=np.float)
+  y = np.array(list(y), dtype=float)
   X_mat = scipy.io.loadmat(args.feature_file)
-  X = np.asarray(X_mat['feats_mat'], dtype=np.float)
+  X = np.asarray(X_mat['feats_mat'], dtype=float)
 
   best_params_mat = scipy.io.loadmat(args.best_parameter+'_SVR.mat')
-  best_params_SVR = {'C': np.asarray(best_params_mat['best_parameters'][0,0][0][0][0], dtype=np.float),
-                     'gamma': np.asarray(best_params_mat['best_parameters'][0,0][0][0][1], dtype=np.float)}
+  best_params_SVR = {'C': np.asarray(best_params_mat['best_parameters'][0,0][0][0][0], dtype=float),
+                     'gamma': np.asarray(best_params_mat['best_parameters'][0,0][0][0][1], dtype=float)}
   best_params_mat = scipy.io.loadmat(args.best_parameter+'_linearSVR.mat')
-  best_params_linearSVR = {'C': np.asarray(best_params_mat['best_parameters'][0,0][0][0][0], dtype=np.float),
-                     'epsilon': np.asarray(best_params_mat['best_parameters'][0,0][0][0][1], dtype=np.float)}
+  best_params_linearSVR = {'C': np.asarray(best_params_mat['best_parameters'][0,0][0][0][0], dtype=float),
+                     'epsilon': np.asarray(best_params_mat['best_parameters'][0,0][0][0][1], dtype=float)}
   
   ## preprocessing
   X[np.isinf(X)] = np.nan
@@ -179,9 +180,9 @@ def main(args):
   if not os.path.exists(dir_path):
     os.makedirs(dir_path)
   scipy.io.savemat(args.predicted_score+'_SVR.mat', 
-      mdict={'predicted_score': np.asarray(y_pred_logistic_SVR,dtype=np.float)})
+      mdict={'predicted_score': np.asarray(y_pred_logistic_SVR,dtype=float)})
   scipy.io.savemat(args.predicted_score+'_linearSVR.mat', 
-      mdict={'predicted_score': np.asarray(y_pred_logistic_linearSVR,dtype=np.float)})
+      mdict={'predicted_score': np.asarray(y_pred_logistic_linearSVR,dtype=float)})
 
 if __name__ == '__main__':
   args = arg_parser()

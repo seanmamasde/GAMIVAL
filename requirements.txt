@@ -1,7 +1,8 @@
 ffmpeg-python
 numpy
 imageio
-tensorflow
+# tensorflow==2.15.1
+tensorflow[and-cuda]==2.15.1 # for tensorrt
 Keras
 glob2
 argparse

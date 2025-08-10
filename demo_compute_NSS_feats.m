@@ -3,7 +3,7 @@
 % =========================================================================
 
 % Close all figures and clear workspace
-close all; 
+close all;
 clear;
 
 % Add necessary folders to path (recursively)
@@ -14,7 +14,7 @@ addpath(genpath('include'));
 % =========================================================================
 
 algo_name = 'GAMIVAL';              % Algorithm name, e.g., 'V-BLIINDS', 'GAMIVAL'
-data_name = 'GamingVideoSET';       % Dataset name, e.g., 'KONVID_1K'
+data_name = 'LIVE-Meta-Gaming';     % Dataset name, e.g., 'KONVID_1K'
 write_file = true;                  % If true, saves features while processing
 log_level = 0;                      % Log verbosity (1 = verbose, 0 = quiet)
 
@@ -28,7 +28,7 @@ elseif strcmp(data_name, 'GamingVideoSET')
 elseif strcmp(data_name, 'KUGVD')
     data_path = '/Volumes/Seagate/Dataset/KUGVD';
 elseif strcmp(data_name, 'LIVE-Meta-Gaming')
-    data_path = '/Volumes/Seagate/Dataset/LIVE-Meta-Gaming';
+    data_path = '/home/seanma/src/GAMIVAL/Dataset/LIVE-Meta-Gaming/mp4';
 elseif strcmp(data_name, 'CGVDS')
     data_path = '/Volumes/Seagate/Dataset/CGVDS';
 end
@@ -67,8 +67,17 @@ feats_mat = [];
 % =========================================================================
 
 % Use `parfor` here for parallel processing if needed
+barWidth = 100;
+% parpool('local');
+% dq = parallel.pool.DataQueue;        % queue for worker->client messages
+% afterEach(dq,@(pct) ...
+%     fprintf('\r[%s] %3.0f%%', ...
+%     [repmat('=',1,floor(pct*barWidth)) repmat(' ',1,barWidth-floor(pct*barWidth))], ...
+%     pct*100));
+% step = 1/num_videos;
+% parfor i = 1:num_videos
 for i = 1:num_videos
-    progressbar(i / num_videos);  % Display progress bar in figure window
+    % progressbar(i / num_videos);  % Display progress bar in figure window
 
     % Construct video and YUV file names based on dataset type
     if strcmp(data_name, 'YT-UGC-Gaming')
@@ -80,11 +89,11 @@ for i = 1:num_videos
         yuv_name = fullfile(video_tmp, [filelist.File{i}, '.yuv']);
     end
 
-    fprintf('\n\nComputing features for %d sequence: %s\n', i, video_name);
+    % fprintf('\n\nComputing features for %d sequence: %s\n', i, video_name);
 
     % Use FFmpeg to decode video to YUV format (YUV420p)
-    cmd = ['ffmpeg -loglevel error -y -i ', video_name, ...
-           ' -pix_fmt yuv420p -vsync 0 ', yuv_name];
+    cmd = ['ffmpeg -loglevel error -y -threads 0 -i ', video_name, ...
+        ' -pix_fmt yuv420p -vsync 0 ', yuv_name];
     system(cmd);
 
     % Read video resolution
@@ -109,8 +118,8 @@ for i = 1:num_videos
     % Extract features using the GAMIVAL algorithm
     tStart = tic;
     feats_frames = calc_GAMIVAL_features(yuv_name, width, height, ...
-                                         framerate, log_level);
-    fprintf('\nOverall %f seconds elapsed...', toc(tStart));
+        framerate, log_level);
+    % fprintf('\nOverall %f seconds elapsed...', toc(tStart));
 
     % Average frame-level features to get video-level representation
     feats_mat(i, :) = nanmean(feats_frames);
@@ -122,4 +131,16 @@ for i = 1:num_videos
     if write_file
         save(out_mat_name, 'feats_mat');
     end
+
+    % status bar
+    pct = i / num_videos;
+    nBars = floor(pct * barWidth);
+    bar = [repmat('=',1,nBars) repmat(' ',1,barWidth-nBars)];
+    fprintf('\r[%s] %3.0f%%', bar, pct*100);
+    % send(dq, step*i);
 end
+
+% if write_file
+%     save(out_mat_name, 'feats_mat');
+% end
+% fprintf('\n'); 

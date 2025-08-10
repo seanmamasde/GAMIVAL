@@ -1,4 +1,4 @@
-Filename,MOS,MOS-STD,TrueHeight,TrueWidth,DisplayHeight,DisplayWidth,Framerate,Bitrate,Content
+File,MOS,MOS-STD,TrueHeight,TrueWidth,DisplayHeight,DisplayWidth,framerate,Bitrate,Content
 a91_1_832x360_30_250kbps_.mp4,41.508,2.486,360,832,952,2204,30,250kbps,a91_1
 a91_2_832x360_30_250kbps_.mp4,10.197,2.373,360,832,952,2204,30,250kbps,a91_2
 bejewelled_1_360x640_30_250kbps_.mp4,46.838,2.333,640,360,1920,1080,30,250kbps,bejewelled_1

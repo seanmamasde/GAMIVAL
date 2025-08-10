@@ -1,10 +1,13 @@
+# export TRT_LIB_DIR="$CONDA_PREFIX/lib/python3.11/site-packages/tensorrt_libs"
+# export LD_LIBRARY_PATH="$TRT_LIB_DIR:$LD_LIBRARY_PATH"
+# export TF_CPP_MAX_VLOG_LEVEL=2
 import ffmpeg
 import  numpy as np
 import imageio
 np.random.seed(7)
 import tensorflow as tf
 tf.compat.v1.Session()
-tf.random.set_random_seed(9)
+tf.random.set_seed(9)
 from tensorflow.keras.models import  load_model
 from tensorflow.keras.applications import densenet
 import glob
@@ -67,12 +70,12 @@ if __name__== "__main__":
     
     parser.add_argument('-mp', '--model', action='store', dest='model', default=r'./models/subjectiveDemo2_DMOS_Final.model' ,
                     help='Specify model together with the path, e.g. ./models/subjectiveDemo2_DMOS_Final.model')
-    parser.add_argument('--video_path', type=str, default='.',
+    parser.add_argument('--video_path', type=str, default='/home/seanma/src/GAMIVAL/Dataset/LIVE-Meta-Gaming/mp4',
                     help='Directory containing the input videos.')
     
     args = parser.parse_args()
     
-    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'#cpu only
+    # os.environ['CUDA_VISIBLE_DEVICES'] = '-1'#cpu only
 
     csv_file = os.path.join('mos_files', args.dataset_name+'_metadata.csv')
     df = pd.read_csv(csv_file)
@@ -90,6 +93,7 @@ if __name__== "__main__":
         feature_patch_total.append(feature_patch)
         feats_frame_patch_total[i,0] = feats_frame_patch
         print('Overall {} secs lapsed..'.format(time.time() - t_overall_start))
-        scipy.io.savemat('feat_files/LIVE-Meta-Mobile-Cloud-Gaming_CNN_bicubic_feats.mat', mdict={'feats_mat': np.asarray(feature_patch_total,dtype=np.float)})
+        # scipy.io.savemat('feat_files/LIVE-Meta-Mobile-Cloud-Gaming_CNN_bicubic_feats.mat', mdict={'feats_mat': np.asarray(feature_patch_total,dtype=np.float)})
+        scipy.io.savemat('feat_files/LIVE-Meta-Mobile-Cloud-Gaming_CNN_bicubic_feats.mat', mdict={'feats_mat': np.asarray(feature_patch_total,dtype=float)})
     
     #scipy.io.savemat('feats_files/LIVE-Meta-Mobile-Cloud-Gaming_CNN_bicubic_feats_frame.mat', mdict={'feats_mat_frames': np.asarray(feats_frame_patch_total,dtype=np.object)})
